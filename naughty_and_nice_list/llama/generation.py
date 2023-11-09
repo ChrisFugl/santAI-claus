@@ -92,7 +92,7 @@ class Llama:
         torch.cuda.set_device(local_rank)
 
         # seed must be the same in all processes
-        torch.manual_seed(seed)
+        # torch.manual_seed(seed)
 
         if local_rank > 0:
             sys.stdout = open(os.devnull, "w")
