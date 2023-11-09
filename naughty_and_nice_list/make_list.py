@@ -60,7 +60,7 @@ Harry Potter thinks that he is just an ordinary lonely boy, but discovers on his
 1. May: Trapped his cousin in a snake enclosure.
 2. June: Opened his first bank account.
 3. October: Laughed at his friend's remark about a fellow student not having any friends.
-4. November: Saved the other student from a troll.
+4. November: Saved the fellow student from a troll.
 
 Instructions:
 
