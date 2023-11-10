@@ -18,7 +18,6 @@ MONTH_NAMES = [
     "September",
     "October",
     "November",
-    "December",
 ]
 
 DEED_SCORES = {
