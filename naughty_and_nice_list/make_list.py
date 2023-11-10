@@ -1,11 +1,10 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
-
-from random import randint
-from textwrap import dedent
+import json
+import os
+import random
 
 import fire
 import torch
+from tqdm import tqdm
 
 from llama import Llama
 
@@ -28,7 +27,6 @@ Input:
 Name: Tyrion Lannister
 Age: 25
 Location: Westeros
-Occupation: Advisor
 Myers–Briggs Type Indicator:
 * E/I: Introversion
 * S/N: Sensing
@@ -52,7 +50,6 @@ Input:
 Name: Harry Potter
 Age: 11
 Location: London
-Occupation: Student
 Myers–Briggs Type Indicator:
 * E/I: Introversion
 * S/N: Intuition
@@ -87,6 +84,7 @@ Be concise. Take care to use neutral language and to not justify bad behaviour o
 def main(
     ckpt_dir: str,
     tokenizer_path: str,
+    data_dir: str = "./data",
     temperature: float = 0.6,
     top_p: float = 0.9,
 ):
@@ -108,44 +106,48 @@ def main(
         max_batch_size=MAX_BATCH_SIZE,
     )
 
-    people = [
-        dedent("""
-            Name: John
-            Age: 10
-            Location: Oslo
-            Occupation: Student
-            Myers–Briggs Type Indicator:
-            * E/I: Extraversion
-            * S/N: Sensing
-            * T/F: Thinking
-            * J/P: Perceiving
-            Key acts:
-            * January: 1 good deed
-            * February: 1 bad deed
-            * May: 1 slightly good deed
-            * August: 1 neutral deed
-            * November: 1 very bad deed
-        """),
-    ]
+    filepaths = [f"{data_dir}/{filename}" for filename in os.listdir(data_dir)]
 
-    for person in people:
-        for _ in range(3):
-            torch.manual_seed(randint(0, 2 ** 32 - 1))
+    progress_bar = tqdm(filepaths, desc="Generating samples")
 
-            dialog = [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": person},
-            ]
-            dialogs = [dialog]
-            result = generator.chat_completion(
-                dialogs,
-                max_gen_len=None,
-                temperature=temperature,
-                top_p=top_p,
-            )[0]
+    for filepath in progress_bar:
+        with open(filepath, "r") as f:
+            person = json.load(f)
 
-            print(result["generation"]["content"])
-            print("\n==================================\n")
+        key_acts = "\n".join(f"* {deed['month']}: 1 {deed['deed']} deed" for deed in person["deeds"])
+
+        type_indicator = person["type_indicator"]
+
+        prompt = f"""
+Name: {person['name']}
+Age: {person['age']}
+Country: {person['country']}
+Myers–Briggs Type Indicator:
+* E/I: {type_indicator['E/I']}
+* S/N: {type_indicator['S/N']}
+* T/F: {type_indicator['T/F']}
+* J/P: {type_indicator['J/P']}
+Key acts:
+{key_acts}""".strip()
+
+        torch.manual_seed(random.randint(0, 2 ** 32 - 1))
+
+        dialog = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ]
+        dialogs = [dialog]
+        result = generator.chat_completion(
+            dialogs,
+            max_gen_len=None,
+            temperature=temperature,
+            top_p=top_p,
+        )[0]
+
+        person["description"] = result["generation"]["content"]
+
+        with open(filepath, "w") as f:
+            json.dump(person, f, indent=2)
 
 
 if __name__ == "__main__":
