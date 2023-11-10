@@ -29,6 +29,11 @@ Name: Tyrion Lannister
 Age: 25
 Location: Westeros
 Occupation: Advisor
+Myers–Briggs Type Indicator:
+* E/I: Introversion
+* S/N: Sensing
+* T/F: Thinking
+* J/P: Juding
 Key acts:
 * January: 1 good deed
 * May: 1 neutral deed
@@ -48,6 +53,11 @@ Name: Harry Potter
 Age: 11
 Location: London
 Occupation: Student
+Myers–Briggs Type Indicator:
+* E/I: Introversion
+* S/N: Intuition
+* T/F: Feeling
+* J/P: Perceiving
 Key acts:
 * May: 1 slightly bad deed
 * June: 1 neutral deed
@@ -99,42 +109,23 @@ def main(
     )
 
     people = [
-        # dedent("""
-        #     Name: John
-        #     Age: 10
-        #     Location: Oslo
-        #     Occupation: Student
-        #     Key acts:
-        #         * January: 1 good deed
-        #         * February: 1 bad deed
-        #         * May: 1 slightly good deed
-        #         * August: 1 neutral deed
-        #         * November: 1 very bad deed
-        # """),
         dedent("""
-            Name: Elisabeth
+            Name: John
             Age: 10
             Location: Oslo
             Occupation: Student
+            Myers–Briggs Type Indicator:
+            * E/I: Extraversion
+            * S/N: Sensing
+            * T/F: Thinking
+            * J/P: Perceiving
             Key acts:
-                * January: 1 good deed
-                * February: 1 bad deed
-                * May: 1 slightly good deed
-                * August: 1 neutral deed
-                * November: 1 very bad deed
+            * January: 1 good deed
+            * February: 1 bad deed
+            * May: 1 slightly good deed
+            * August: 1 neutral deed
+            * November: 1 very bad deed
         """),
-        # dedent("""
-        #     Name: John
-        #     Age: 10
-        #     Location: Oslo
-        #     Occupation: Student
-        #     Key acts:
-        #         * January: 1 very good deed
-        #         * February: 1 very good deed
-        #         * May: 1 very good deed
-        #         * August: 1 very good deed
-        #         * November: 1 very good deed
-        # """),
     ]
 
     for person in people:
