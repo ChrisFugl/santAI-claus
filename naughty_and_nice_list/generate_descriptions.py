@@ -85,8 +85,8 @@ def main(
     ckpt_dir: str,
     tokenizer_path: str,
     data_dir: str = "./data",
-    temperature: float = 0.6,
-    top_p: float = 0.9,
+    temperature: float = 0.05,
+    top_p: float = 0.95,
 ):
     """
     Entry point of the program for generating text using a pretrained model.
@@ -94,6 +94,7 @@ def main(
     Args:
         ckpt_dir (str): The directory containing checkpoint files for the pretrained model.
         tokenizer_path (str): The path to the tokenizer model used for text encoding/decoding.
+        data_dir (str, optional): The directory containing the data files. Defaults to "./data".
         temperature (float, optional): The temperature value for controlling randomness in generation.
             Defaults to 0.6.
         top_p (float, optional): The top-p sampling parameter for controlling diversity in generation.
