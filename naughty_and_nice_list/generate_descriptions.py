@@ -108,6 +108,8 @@ def main(
 
     filepaths = [f"{data_dir}/{filename}" for filename in os.listdir(data_dir)]
 
+    filepaths = sorted(filepaths, key=_filepath_to_index)
+
     progress_bar = tqdm(filepaths, desc="Generating samples")
 
     for filepath in progress_bar:
@@ -148,6 +150,12 @@ Key acts:
 
         with open(filepath, "w") as f:
             json.dump(person, f, indent=2)
+
+
+def _filepath_to_index(filepath: str):
+    filename = filepath.split("/")[-1]
+    stem = filename.split(".")[0]
+    return int(stem)
 
 
 if __name__ == "__main__":
