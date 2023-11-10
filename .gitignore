@@ -4,6 +4,9 @@ llama-2-13b-chat/
 llama-2-70b-chat/
 tokenizer.model
 
+# Data files
+naughty_and_nice_list/data
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
