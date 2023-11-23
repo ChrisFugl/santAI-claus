@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
@@ -123,6 +124,13 @@ class DataModule(pl.LightningDataModule):
 
             description = person["description"]
             label = int(person["score"] >= self._niceness_threshold)
+
+            try:
+                description = self._extract_enumerated_lines(description)
+            except ValueError:
+                # We only want to keep people who follow the "1, 2, ..." format.
+                continue
+
             data.append((description, label))
 
         print(f"{split} size: {len(data):,}")
@@ -133,6 +141,36 @@ class DataModule(pl.LightningDataModule):
             output = {"description": description, "label": label}
             path = save_dir / f"{index}.json"
             path.write_text(json.dumps(output))
+
+    def _extract_enumerated_lines(self, description: str) -> bool:
+        """
+        Llama was asked to generate descriptions according to the following format:
+
+        -------------
+        [description]
+
+        1. [month]: [event]
+        2. [month]: [event]
+        ...
+        n. [month]: [event]
+        -------------
+
+        We will only be providing the enumerated lines (1, 2, ..., n) to the model.
+        """
+        lines = description.split("\n")
+        enumerated_lines = []
+        number_pattern = re.compile(r"^\d+\.")
+        for line in lines:
+            if number_pattern.match(line):
+                enumerated_lines.append(line)
+
+            if "Peter's best friend moved away to a different city, and" in line:
+                print(description)
+
+        if len(enumerated_lines) == 0:
+            raise ValueError("No enumerated lines found.")
+
+        return "\n".join(enumerated_lines)
 
 
 class Dataset(torch.utils.data.Dataset):
