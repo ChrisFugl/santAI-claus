@@ -39,7 +39,6 @@ class DataModule(pl.LightningDataModule):
 
         self._batch_size = batch_size
         self._data_dir = Path(data_dir)
-        self._train_val_test_split = train_val_test_split
         self._niceness_threshold = niceness_threshold
         self._num_workers = num_workers
 
@@ -48,53 +47,16 @@ class DataModule(pl.LightningDataModule):
         self.prepare_data_per_node = True
 
     def prepare_data(self):
-        data: list[tuple[str, int]] = []
-
-        # Filter data
-        paths = self._data_dir.glob("*.json")
-        for path in paths:
-            try:
-                person = json.loads(path.read_text())
-            except json.JSONDecodeError:
-                # Some of the files were corrupted by the generator (it generated invalid JSON).
-                # We could fix them, but it is easier to generate more data and ignore the corrupted files.
-                continue
-
-            if "description" not in person:
-                # We may encounter people in the directory for whom we haven't yet generated descriptions.
-                # We will just ignore these people for now.
-                continue
-
-            description = person["description"]
-            label = int(person["score"] >= self._niceness_threshold)
-            data.append((description, label))
-
-        print(f"Dataset size: {len(data):,}")
-
-        # Split into train, val, and test
-        train_ratio, val_ratio, _ = self._train_val_test_split
-
-        train_end_index = int(train_ratio * len(data))
-        train_data = data[:train_end_index]
-        print(f"Train size: {len(train_data):,}")
-
-        val_end_index = train_end_index + int(val_ratio * len(data))
-        val_data = data[train_end_index:val_end_index]
-        print(f"Validation size: {len(val_data):,}")
-
-        test_data = data[val_end_index:]
-        print(f"Test size: {len(test_data):,}")
-
-        self._save_data(train_data, "train")
-        self._save_data(val_data, "val")
-        self._save_data(test_data, "test")
+        self._prepare_split("training")
+        self._prepare_split("validation")
+        self._prepare_split("testing")
 
     def setup(self, stage: str):
         if stage == "fit":
-            self._train_dataset = Dataset(self._prepared_data_dir / "train")
-            self._val_dataset = Dataset(self._prepared_data_dir / "val")
+            self._train_dataset = Dataset(self._prepared_data_dir / "training")
+            self._val_dataset = Dataset(self._prepared_data_dir / "validation")
         elif stage == "test":
-            self._test_dataset = Dataset(self._prepared_data_dir / "test")
+            self._test_dataset = Dataset(self._prepared_data_dir / "testing")
         else:
             raise ValueError(f"Unsupported stage: {stage}")
 
@@ -102,11 +64,11 @@ class DataModule(pl.LightningDataModule):
         if stage == "fit":
             del self._train_dataset
             del self._val_dataset
-            rmtree(self._prepared_data_dir / "train")
-            rmtree(self._prepared_data_dir / "val")
+            rmtree(self._prepared_data_dir / "training")
+            rmtree(self._prepared_data_dir / "validation")
         elif stage == "test":
             del self._test_dataset
-            rmtree(self._prepared_data_dir / "test")
+            rmtree(self._prepared_data_dir / "testing")
         else:
             raise ValueError(f"Unsupported stage: {stage}")
 
@@ -140,8 +102,32 @@ class DataModule(pl.LightningDataModule):
             pin_memory=True,
         )
 
-    def _save_data(self, data: list[tuple[str, int]], name: str):
-        save_dir = self._prepared_data_dir / name
+    def _prepare_split(self, split: str):
+        data: list[tuple[str, int]] = []
+
+        # Filter data
+        split_dir = self._data_dir / split
+        paths = split_dir.glob("*.json")
+        for path in paths:
+            try:
+                person = json.loads(path.read_text())
+            except json.JSONDecodeError:
+                # Some of the files were corrupted by the generator (it generated invalid JSON).
+                # We could fix them, but it is easier to generate more data and ignore the corrupted files.
+                continue
+
+            if "description" not in person:
+                # We may encounter people in the directory for whom we haven't yet generated descriptions.
+                # We will just ignore these people for now.
+                continue
+
+            description = person["description"]
+            label = int(person["score"] >= self._niceness_threshold)
+            data.append((description, label))
+
+        print(f"{split} size: {len(data):,}")
+
+        save_dir = self._prepared_data_dir / split
         save_dir.mkdir(parents=True, exist_ok=True)
         for index, (description, label) in enumerate(data):
             output = {"description": description, "label": label}
