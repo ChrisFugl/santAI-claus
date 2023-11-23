@@ -19,7 +19,6 @@ class DataModule(pl.LightningDataModule):
         data_dir: Union[str, Path],
         train_val_test_split: tuple[float, float, float] = (0.8, 0.1, 0.1),
         niceness_threshold: Union[int, float] = 0,
-        num_workers: int = 3,
     ):
         """
         Args:
@@ -28,7 +27,6 @@ class DataModule(pl.LightningDataModule):
             train_val_test_split: The split to use for training, validation, and testing. Must sum to 1.
             niceness_threshold: The threshold to use to determine whether a person is naughty or nice
                 A person is classified as naughty if their niceness score is below the threshold.
-            num_workers: The number of workers to use for loading the data.
         """
         super().__init__()
 
@@ -41,7 +39,6 @@ class DataModule(pl.LightningDataModule):
         self._batch_size = batch_size
         self._data_dir = Path(data_dir)
         self._niceness_threshold = niceness_threshold
-        self._num_workers = num_workers
 
         self._prepared_data_dir = Path(gettempdir()) / "santas_ai_helper"
 
@@ -78,7 +75,7 @@ class DataModule(pl.LightningDataModule):
             self._train_dataset,
             batch_size=self._batch_size,
             collate_fn=Collator(),
-            num_workers=self._num_workers,
+            num_workers=0,
             shuffle=True,
             pin_memory=True,
         )
@@ -88,7 +85,7 @@ class DataModule(pl.LightningDataModule):
             self._val_dataset,
             batch_size=self._batch_size,
             collate_fn=Collator(),
-            num_workers=self._num_workers,
+            num_workers=0,
             shuffle=False,
             pin_memory=True,
         )
@@ -98,7 +95,7 @@ class DataModule(pl.LightningDataModule):
             self._test_dataset,
             batch_size=self._batch_size,
             collate_fn=Collator(),
-            num_workers=self._num_workers,
+            num_workers=0,
             shuffle=False,
             pin_memory=True,
         )
