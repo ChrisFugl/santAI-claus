@@ -13,6 +13,7 @@ class Model(pl.LightningModule):
         learning_rate: float,
     ):
         super().__init__()
+        self.save_hyperparameters()
 
         self._learning_rate = learning_rate
 
@@ -24,6 +25,9 @@ class Model(pl.LightningModule):
         self._precision = torchmetrics.Precision(task="binary")
         self._recall = torchmetrics.Recall(task="binary")
         self._f1 = torchmetrics.F1Score(task="binary")
+
+    def forward(self, **kwargs):
+        return self._model(**kwargs)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
