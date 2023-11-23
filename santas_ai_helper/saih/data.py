@@ -161,9 +161,6 @@ class DataModule(pl.LightningDataModule):
             if number_pattern.match(line):
                 enumerated_lines.append(line)
 
-            if "Peter's best friend moved away to a different city, and" in line:
-                print(description)
-
         if len(enumerated_lines) == 0:
             raise ValueError("No enumerated lines found.")
 
