@@ -20,10 +20,10 @@ class Model(pl.LightningModule):
             MODEL_NAME, num_labels=len(LABEL_TO_CLASS),
         )
 
-        self._accuracy = torchmetrics.Accuracy()
-        self._precision = torchmetrics.Precision()
-        self._recall = torchmetrics.Recall()
-        self._f1 = torchmetrics.F1()
+        self._accuracy = torchmetrics.Accuracy(task="binary")
+        self._precision = torchmetrics.Precision(task="binary")
+        self._recall = torchmetrics.Recall(task="binary")
+        self._f1 = torchmetrics.F1Score(task="binary")
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
