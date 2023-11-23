@@ -23,6 +23,8 @@ def main():
         accelerator="gpu",
         devices=torch.cuda.device_count(),
         max_epochs=args.epochs,
+        log_every_n_steps=5,
+        precision=16,
     )
 
     trainer.fit(model, datamodule)
