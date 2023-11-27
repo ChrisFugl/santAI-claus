@@ -10,6 +10,7 @@ naughty_and_nice_list/data
 # Trained models and logs
 santas_ai_helper/core
 santas_ai_helper/lightning_logs/
+santas_ai_helper/models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
