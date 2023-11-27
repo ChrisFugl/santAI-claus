@@ -1,4 +1,5 @@
 import argparse
+from random import random
 
 import lightning.pytorch as pl
 import torch
@@ -82,15 +83,21 @@ def _get_args():
         default=18,
         help="The maximum age of people included in the dataset.",
     )
+    parser.add_argument(
+        "--drop-person-prop",
+        type=float,
+        required=False,
+        default=0.0,
+    )
 
     args = parser.parse_args()
 
     return args
 
 
-def _create_filter(min_age: int, max_age: int):
+def _create_filter(min_age: int, max_age: int, drop_person_prop: float):
     def _filter(person: dict):
-        return min_age <= person["age"] <= max_age
+        return random() < drop_person_prop or (min_age <= person["age"] and person["age"] <= max_age)
 
     return _filter
 
