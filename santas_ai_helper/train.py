@@ -13,11 +13,22 @@ def main():
     datamodule = DataModule(
         batch_size=args.batch_size,
         data_dir=args.data_dir,
+        filter=_create_filter(args.min_age, args.max_age),
     )
 
     model = Model(
         learning_rate=args.learning_rate,
     )
+
+    callbacks = [
+        pl.callbacks.ModelCheckpoint(
+            monitor="val/f1",
+            mode="max",
+            save_top_k=1,
+            save_last=True,
+            filename="best",
+        ),
+    ]
 
     trainer = pl.Trainer(
         accelerator="gpu",
@@ -25,6 +36,7 @@ def main():
         max_epochs=args.epochs,
         log_every_n_steps=5,
         precision=16,
+        callbacks=callbacks,
     )
 
     trainer.fit(model, datamodule)
@@ -56,10 +68,31 @@ def _get_args():
         required=True,
         help="The number of epochs to use for training.",
     )
+    parser.add_argument(
+        "--min-age",
+        type=int,
+        required=False,
+        default=0,
+        help="The minimum age of people included in the dataset.",
+    )
+    parser.add_argument(
+        "--max-age",
+        type=int,
+        required=False,
+        default=18,
+        help="The maximum age of people included in the dataset.",
+    )
 
     args = parser.parse_args()
 
     return args
+
+
+def _create_filter(min_age: int, max_age: int):
+    def _filter(person: dict):
+        return min_age <= person["age"] <= max_age
+
+    return _filter
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
+from typing import Callable
 from typing import Union
 
 import lightning.pytorch as pl
@@ -10,6 +11,12 @@ import torch
 from transformers import BertTokenizer
 
 from saih.constants import MODEL_NAME
+
+Filter = Callable[[dict], bool]
+
+
+def _allow_all_filter(person: dict) -> bool:
+    return True
 
 
 class DataModule(pl.LightningDataModule):
@@ -19,6 +26,7 @@ class DataModule(pl.LightningDataModule):
         data_dir: Union[str, Path],
         train_val_test_split: tuple[float, float, float] = (0.8, 0.1, 0.1),
         niceness_threshold: Union[int, float] = 0,
+        filter: Filter = _allow_all_filter,
     ):
         """
         Args:
@@ -27,6 +35,7 @@ class DataModule(pl.LightningDataModule):
             train_val_test_split: The split to use for training, validation, and testing. Must sum to 1.
             niceness_threshold: The threshold to use to determine whether a person is naughty or nice
                 A person is classified as naughty if their niceness score is below the threshold.
+            filter: A function that takes a person and returns whether to include them in the dataset.
         """
         super().__init__()
 
@@ -39,6 +48,7 @@ class DataModule(pl.LightningDataModule):
         self._batch_size = batch_size
         self._data_dir = Path(data_dir)
         self._niceness_threshold = niceness_threshold
+        self._filter = filter
 
         self._prepared_data_dir = Path(gettempdir()) / "santas_ai_helper"
 
@@ -117,6 +127,9 @@ class DataModule(pl.LightningDataModule):
             if "description" not in person:
                 # We may encounter people in the directory for whom we haven't yet generated descriptions.
                 # We will just ignore these people for now.
+                continue
+
+            if not self._filter(person):
                 continue
 
             description = person["description"]
