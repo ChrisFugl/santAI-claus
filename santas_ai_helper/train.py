@@ -1,5 +1,4 @@
 import argparse
-from pathlib import Path
 from random import random
 
 import lightning.pytorch as pl
@@ -23,7 +22,7 @@ def main():
         learning_rate=args.learning_rate,
     )
 
-    output_dir = MODELS_DIR / f"models/{args.name}"
+    output_dir = MODELS_DIR / args.name
 
     callbacks = [
         pl.callbacks.ModelCheckpoint(
@@ -109,7 +108,9 @@ def _get_args():
 
 def _create_filter(min_age: int, max_age: int, drop_person_prop: float):
     def _filter(person: dict):
-        return random() < drop_person_prop or (min_age <= person["age"] and person["age"] <= max_age)
+        age = person["age"]
+        kept_at_random = random() > drop_person_prop
+        return kept_at_random and min_age <= age and age <= max_age
 
     return _filter
 
