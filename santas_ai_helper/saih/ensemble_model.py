@@ -1,9 +1,8 @@
-from pathlib import Path
-
 import lightning.pytorch as pl
 import torch
 import torchmetrics
 
+from saih.constants import MODELS_DIR
 from saih.model import Model
 
 
@@ -13,7 +12,7 @@ class EnsembleModel(pl.LightningModule):
 
         self._models = torch.nn.ModuleList()
         for model_name in model_names:
-            checkpoint_dir = Path("lightning_logs") / model_name / "checkpoints" / "best.ckpt"
+            checkpoint_dir = MODELS_DIR / model_name / "best.ckpt"
             model = Model.load_from_checkpoint(checkpoint_dir)
             self._models.append(model)
 

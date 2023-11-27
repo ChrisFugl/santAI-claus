@@ -1,9 +1,11 @@
 import argparse
+from pathlib import Path
 from random import random
 
 import lightning.pytorch as pl
 import torch
 
+from saih.constants import MODELS_DIR
 from saih.data import DataModule
 from saih.model import Model
 
@@ -14,12 +16,14 @@ def main():
     datamodule = DataModule(
         batch_size=args.batch_size,
         data_dir=args.data_dir,
-        filter=_create_filter(args.min_age, args.max_age),
+        filter=_create_filter(args.min_age, args.max_age, args.drop_person_prop),
     )
 
     model = Model(
         learning_rate=args.learning_rate,
     )
+
+    output_dir = MODELS_DIR / f"models/{args.name}"
 
     callbacks = [
         pl.callbacks.ModelCheckpoint(
@@ -28,12 +32,14 @@ def main():
             save_top_k=1,
             save_last=True,
             filename="best",
+            dirpath=output_dir,
         ),
     ]
 
     trainer = pl.Trainer(
         accelerator="gpu",
         devices=torch.cuda.device_count(),
+        default_root_dir=output_dir,
         max_epochs=args.epochs,
         log_every_n_steps=5,
         precision=16,
@@ -88,6 +94,12 @@ def _get_args():
         type=float,
         required=False,
         default=0.0,
+    )
+    parser.add_argument(
+        "--name",
+        type=str,
+        required=True,
+        help="The name of the model.",
     )
 
     args = parser.parse_args()
