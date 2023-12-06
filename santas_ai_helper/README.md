@@ -14,3 +14,32 @@ Run the following command to install the required Python packages:
 ``` sh
 pip install -r requirements.txt
 ```
+
+## Usage
+There are three scripts to train and test the models:
+
+* train.py  -  train a single model
+* test.py   -  evaluate one or more models in an ensemble
+* speed.py  -  measure inference time for an ensemble model
+
+
+Use `--help` to get more information about how to use each script. For example, `python train.py --help` will give you this:
+
+``` txt
+usage: train.py [-h] --data-dir DATA_DIR --batch-size BATCH_SIZE --learning-rate LEARNING_RATE --epochs EPOCHS [--min-age MIN_AGE] [--max-age MAX_AGE] [--drop-person-prop DROP_PERSON_PROP] --name NAME
+
+Train the model.
+
+options:
+  -h, --help            show this help message and exit
+  --data-dir DATA_DIR   Path to the directory containing the data.
+  --batch-size BATCH_SIZE
+                        The batch size to use for training, validation, and testing.
+  --learning-rate LEARNING_RATE
+                        The learning rate to use for training.
+  --epochs EPOCHS       The number of epochs to use for training.
+  --min-age MIN_AGE     The minimum age of people included in the dataset.
+  --max-age MAX_AGE     The maximum age of people included in the dataset.
+  --drop-person-prop DROP_PERSON_PROP
+  --name NAME           The name of the model.
+```
