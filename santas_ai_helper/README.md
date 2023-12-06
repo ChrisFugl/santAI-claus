@@ -7,7 +7,9 @@ This of course means that he is using an ensemble of two deep learning models to
 Santa's AI Helper uses two BERT models and averages their logits to make a final prediction.
 
 ## Installation
-Run the following command to install the required packages:
+We recommend to use the attached devcontainer (for VS Code). This will ensure that you have the required CUDA dependencies.
+
+Run the following command to install the required Python packages:
 
 ``` sh
 pip install -r requirements.txt
