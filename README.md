@@ -1,5 +1,5 @@
-# Santa Claus
-Santa Claus needs our help. There are too many children for him to check whether they are naughty and nice before Christmas. Let's check his list twice with an ensemble deep learning model.
+# SantAI Claus
+Santa Claus needs our help. There are too many children for him to check whether they have been naughty and nice before Christmas. Let's check his list twice with an ensemble deep learning model.
 
 # Usage
 The project contains two separate subprojects:
@@ -28,4 +28,4 @@ This will save 1000 JSON files in `naughty_and_nice_list/data`, where each file 
 NB. `nproc_per_node` is the number of GPUs that will be used for generation. It must be set to 8 for the 70B parameter version, but 2 and 1 for the 13B and 7B parameter versions, respectively. You will need a machine with the required amount of GPUs available in order to use this.
 
 ## Santa's AI Helper
-TODO
+Follow the instructions in _santas_ai_helper/README.md_.
